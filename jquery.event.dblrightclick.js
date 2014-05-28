@@ -2,13 +2,15 @@ $.event.special.dblrightclick = {
 	// On subscribe
 	setup : function(data, namespaces) {
 		var e = $(this);
-		
-		// Configure basic data-fields
 		e.bind("contextmenu", $.event.special.dblrightclick.handler);
-		e.data("x", null);
-		e.data("y", null);
-		e.data("time", null);
-		e.data("limit", data || 400);
+		e.data($.extend({
+			x : null,
+			y : null,
+			time : null,
+			offsetX : 10, // Available X offset (pixels)
+			offsetY : 10, // Available Y offset (pixels)
+			offsetT : 300 // Available time difference (milliseconds)
+		}, data || {}));
 	},
 
 	// On unsubscribe
@@ -16,24 +18,30 @@ $.event.special.dblrightclick = {
 		$(this).unbind("contextmenu", $.event.special.dblrightclick.handler);
 	},
 
-	// Event handler logic
+	// Logic triggering events
 	handler : function (event) {
 		event.preventDefault();
 		var e = $(this);
+		var data = e.data();
 
-		if (e.data("x") == event.screenX && e.data("y") == event.screenY
-			&& (event.timeStamp - e.data("time")) < e.data("limit")) {
-			e.data("x", null);
-			e.data("y", null);
-			e.data("time", null);
+		var diffX = Math.abs(data.x - event.screenX);
+		var diffY = Math.abs(data.y - event.screenY);
+		var diffT = Math.abs(event.timeStamp - data.time);
+
+		if (diffX < data.offsetX && diffY < data.offsetY && diffT < data.offsetT) {
+			e.data({
+				x : null,
+				y : null,
+				time : null
+			});
 			event.type = "dblrightclick";
-			
-			// Trigger event
 			$.event.dispatch.apply(this, arguments);
 		} else {
-			e.data("x", event.screenX);
-			e.data("y", event.screenY);
-			e.data("time", event.timeStamp);
+			e.data({
+				x : event.screenX,
+				y : event.screenY,
+				time : event.timeStamp
+			});
 		}
 	}
 };
