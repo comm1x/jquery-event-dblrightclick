@@ -1,12 +1,22 @@
-jquery-event-dblrightclick
+jQuery.event.dblrightclick
 ==========================
 
 Special event "Double right click" for jQuery 2
 
 Usage:
 
-<code>
+```javascript
+// Simple usage
 $("#widget").on("dblrightclick", ".item", function() {
-  // Event logic here...
+    alert("This is double right click!");
 });
-</code>
+
+// With params
+$("#widget").on("dblrightclick", ".item", {
+    offsetX : 2,
+    offsetY : 2,
+    offsetT : 500
+}, function() {
+    alert("This is double right click!");
+});
+```
